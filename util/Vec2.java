@@ -1,3 +1,5 @@
+package util;
+
 public class Vec2 {
 
     public double x;

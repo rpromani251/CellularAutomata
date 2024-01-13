@@ -1,3 +1,5 @@
+package util;
+
 public class Mouse {
     // Create Class Attributes:
     private Vec2 pos, prevPos;
@@ -54,7 +56,4 @@ public class Mouse {
     public Vec2 GetPreviousPosition() {
         return this.prevPos;
     }
-}
- {
-    
 }
