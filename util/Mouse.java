@@ -9,11 +9,12 @@ public class Mouse {
 
     // Empty Constructor to set Default Values:
     public Mouse() {
-        minCursorSize = 20;
-        maxCursorSize = 100;
+        minCursorSize = 1;
+        maxCursorSize = 20;
         cursorSize = minCursorSize;
 
-        pos = prevPos = new Vec2();
+        pos = new Vec2();
+        prevPos = new Vec2();
 
         leftButtonDown = rightButtonDown = false;
     }

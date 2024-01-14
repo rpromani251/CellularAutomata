@@ -1,5 +1,6 @@
 package util;
 
+import java.awt.event.*;
 import javax.swing.*;
 
 public class Main {
@@ -12,7 +13,7 @@ public class Main {
                 JFrame frame = new JFrame("Cellular Automata");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-                // Create instance of AnimationPanel and add it to the main frame, making it focusable
+                // Create instance of Animati5onPanel and add it to the main frame, making it focusable
                 Application app = new Application();
                 frame.add(app);
                 app.setFocusable(true);
@@ -24,11 +25,15 @@ public class Main {
                 frame.setResizable(false);
 
                 // Game Loop:
-                while (true) {
-                    app.Input();
-                    app.Update();
-                    frame.repaint();
-                }
+                Timer timer = new Timer(10, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        app.Input();
+                        app.Update();
+                        frame.repaint();
+                    }
+                });
+                timer.start();
             }
         }); 
     }

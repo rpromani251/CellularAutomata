@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.function.BiConsumer;
 
 public class Application extends JPanel {
     // Window Size:
@@ -28,11 +29,20 @@ public class Application extends JPanel {
 
     // Setup
     public void Setup() {
+        // Create a BiConsumer that takes x and y coordinates and adds a cell at those coordinates
+        BiConsumer<Integer, Integer> addCellAtPosition = (x, y) -> {
+            cellMatrix.addCell(currElement, x, y);
+        };
+        
         // Key Listener:
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
+                    case KeyEvent.VK_0:
+                        currElement = 0;
+                        System.out.println("Current: EmptyCell");
+                        break;
                     case KeyEvent.VK_1:
                         currElement = 1;
                         System.out.println("Current: Stone");
@@ -45,19 +55,18 @@ public class Application extends JPanel {
             // Mouse Button Down: Left -> Destroy, Right -> Place
             @Override
             public void mousePressed(MouseEvent e) {
-                // Update Current Position Stored in Mouse
-                mouse.UpdatePosition(e.getX(), e.getY());
                 
                 // Determine if Left or Right Mouse Button is Clicked
                 if (!mouse.GetLeftButtonDown() && SwingUtilities.isLeftMouseButton(e)) {
                     mouse.SetLeftMouseButton(true);
-                    cellMatrix.addCell(0, (int) mouse.GetPosition().x, (int) mouse.GetPosition().y);
+                    // Update Current Position Stored in Mouse
+                    mouse.UpdatePosition(e.getX(), e.getY());
                 }
 
                 if(!mouse.GetLeftButtonDown() && SwingUtilities.isRightMouseButton(e)) {
                     mouse.SetRightMouseButton(true);
-                    cellMatrix.addCell(currElement, (int) mouse.GetPosition().x, (int) mouse.GetPosition().y);
-                    System.out.println(cellMatrix.getCell((int) mouse.GetPosition().x, (int) mouse.GetPosition().y));
+                    // Update Current Position Stored in Mouse
+                    mouse.UpdatePosition(e.getX(), e.getY());
                 }
             }
 
@@ -67,10 +76,39 @@ public class Application extends JPanel {
                 // Determine if Left or Right Mouse Button is Released
                 if (mouse.GetLeftButtonDown() && SwingUtilities.isLeftMouseButton(e)) {
                     mouse.SetLeftMouseButton(false);
+                    // Update Current Position Stored in Mouse
+                    mouse.UpdatePosition(e.getX(), e.getY());
+                    Vec2.iterateAndApplyMethodBetweenTwoPoints(mouse.GetPosition(), mouse.GetPreviousPosition(), 
+                        (x, y) -> addCellAtPosition.accept(x, y)
+                        // addCellAtPosition.accept((int) mouse.GetPosition().x, (int) mouse.GetPosition().y); // Use the current iteration's x and y
+                );
                 }
 
-                if(mouse.GetLeftButtonDown() && SwingUtilities.isRightMouseButton(e)) {
+                if(mouse.GetRightButtonDown() && SwingUtilities.isRightMouseButton(e)) {
                     mouse.SetRightMouseButton(false);
+                    
+                    // Update Current Position Stored in Mouse
+                    mouse.UpdatePosition(e.getX(), e.getY());
+                    Vec2.iterateAndApplyMethodBetweenTwoPoints(mouse.GetPosition(), mouse.GetPreviousPosition(), 
+                        (x, y) -> addCellAtPosition.accept(x, y)
+                );
+                }
+            }
+        });
+
+        // Mouse Motion Listener:
+        addMouseMotionListener(new MouseMotionAdapter() {
+            // Update current mouse position
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                // Update current mouse position
+                mouse.UpdatePosition(e.getX(), e.getY());
+
+                // Place a cell at the current mouse position
+                if (mouse.GetRightButtonDown()) {
+                    Vec2.iterateAndApplyMethodBetweenTwoPoints(mouse.GetPosition(), mouse.GetPreviousPosition(), 
+                        (x, y) -> addCellAtPosition.accept(x, y)
+                );
                 }
             }
         });
@@ -81,11 +119,11 @@ public class Application extends JPanel {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 // Scroll Wheel Up/Away from User
                 if (e.getWheelRotation() < 0) {
-                    mouse.IncreaseCursorSize(10);
+                    mouse.IncreaseCursorSize(1);
                 }
                 // Scroll Wheel Down/Away from User
                 if (e.getWheelRotation() > 0) {
-                    mouse.IncreaseCursorSize(-10);
+                    mouse.IncreaseCursorSize(-1);
                 }
             }
         });
@@ -100,13 +138,13 @@ public class Application extends JPanel {
     public void Update() {
         
 
-        
     }
 
     @Override
     protected void paintComponent(Graphics g) {
+        // System.out.println("paint component called");
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        cellMatrix.draw(g, (int) mouse.GetPosition().x, (int) mouse.GetPosition().y);
+        cellMatrix.draw(g);
     }
 }
