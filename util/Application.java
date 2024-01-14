@@ -47,6 +47,9 @@ public class Application extends JPanel {
                         currElement = 1;
                         System.out.println("Current: Stone");
                         break;
+                    case KeyEvent.VK_2:
+                        currElement = 2;
+                        System.out.println("Current: Water");
                 }
             }
         });
@@ -136,8 +139,7 @@ public class Application extends JPanel {
 
     // Take info from Mouse State -> Update Cell Matrix -> Update Cells -> Read and Repaint
     public void Update() {
-        
-
+        cellMatrix.Update();
     }
 
     @Override
